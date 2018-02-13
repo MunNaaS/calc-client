@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <landing-page></landing-page>
+    <calc-page></calc-page> 
   </div>
 </template>
 
 <script>
-  import LandingPage from '@/components/LandingPage'
+  import CalcPage from '@/components/CalcPage'
 
   export default {
     name: 'calc-app-client',
     components: {
-      LandingPage
+      CalcPage
     }
   }
 </script>
