@@ -10,19 +10,21 @@
         <button @click="calc('^')">Pow</button> <br>
         Result : <input :value="r" readonly> <br>
         <button @click="save">save</button>
+        <button @click="load">load</button>
     </div>
   </main>
 </template>
 
 <script>
 import c from '@/utils/calc'
+import fs from 'fs'
 export default {
   name: 'calc-page',
   data () {
     return {
-      a: 0,
-      b: 0,
-      r: 0,
+      a: '',
+      b: '',
+      r: '',
       result: {}
     }
   },
@@ -32,15 +34,56 @@ export default {
       this.r = `${x.input.a} ${x.operator} ${x.input.b} = ${x.result}`
       this.result = x
     },
-    save () {
-      this.store()
+    load () {
+      this.localLoad()
     },
-    store () {
-      this.$db.insert(this.result, function (err, result) {
-        if (err) {
-          console.error(err)
+    localLoad () {
+      this.$electron.remote.dialog.showOpenDialog({
+        filters: [
+          {name: 'JSON Files (*.json)', extensions: ['json']},
+          {name: 'All Files (*.*)', extensions: ['*']}
+        ]
+      },
+      (filePaths) => {
+        // filePaths is an array that contains all the selected
+        if (filePaths === undefined) {
+          console.log('No file selected')
+          return
         }
-        console.log(this.$db.filename)
+
+        fs.readFile(filePaths[0], 'utf-8', (err, data) => {
+          if (err) {
+            alert('An error ocurred reading the file :' + err.message)
+            return
+          }
+
+          data = JSON.parse(data)
+          this.a = data.input.a
+          this.b = data.input.b
+          this.r = `${data.input.a} ${data.operator} ${data.input.b} = ${data.result}`
+          this.result = data.result
+        })
+      })
+    },
+    save () {
+      this.localStore()
+    },
+    localStore () {
+      let result = JSON.stringify(this.result)
+      console.log(result)
+      this.$electron.remote.dialog.showSaveDialog((fileName) => {
+        if (fileName === undefined) {
+          console.log("You didn't save the file")
+          return
+        }
+        // fileName is a string that contains the path and filename created in the save file dialog.
+        fs.writeFile(fileName, result, (err) => {
+          if (err) {
+            alert('An error ocurred creating the file ' + err.message)
+          }
+
+          alert('The file has been succesfully saved')
+        })
       })
     }
   }
