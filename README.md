@@ -1,5 +1,7 @@
 # calc-app-client
 
+[![Build Status](https://travis-ci.org/MunNaaS/calc-client.svg?branch=master)](https://travis-ci.org/MunNaaS/calc-client)
+
 > An electron-vue project
 
 #### Build Setup
